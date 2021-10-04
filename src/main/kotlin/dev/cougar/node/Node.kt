@@ -15,8 +15,8 @@ class Node(private val channel: String, host: String?, port: Int, password: Stri
     private val jedisPool: JedisPool
     private var jedisPubSub: JedisPubSub? = null
     private val packetListeners: MutableList<PacketListenerData>
-    private val idToType: MutableMap<Int, Class<*>> = HashMap()
-    private val typeToId: MutableMap<Class<*>, Int> = HashMap()
+    private val idToType: MutableMap<Int, Class<out Packet>> = HashMap()
+    private val typeToId: MutableMap<Class<out Packet>, Int> = HashMap()
     @JvmOverloads
     fun sendPacket(packet: Packet, exceptionHandler: PacketExceptionHandler? = null) {
         try {
@@ -49,15 +49,11 @@ class Node(private val channel: String, host: String?, port: Int, password: Stri
         throw IllegalStateException("Could not create new instance of packet type")
     }
 
-    fun registerPacket(clazz: Class<*>) {
-        try {
-            val id = clazz.getDeclaredMethod("id").invoke(clazz.newInstance(), null) as Int
-            check(!(idToType.containsKey(id) || typeToId.containsKey(clazz))) { "A packet with that ID has already been registered" }
-            idToType[id] = clazz
-            typeToId[clazz] = id
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+    fun registerPacket(clazz: Class<out Packet>) {
+        val id = clazz.getDeclaredMethod("id").invoke(clazz.newInstance(), null) as Int
+        check(!(idToType.containsKey(id) || typeToId.containsKey(clazz))) { "A packet with that ID has already been registered" }
+        idToType[id] = clazz
+        typeToId[clazz] = id
     }
 
     fun registerListenerClass(inputClass : Class<out PacketListener>, vararg args : Any) {
