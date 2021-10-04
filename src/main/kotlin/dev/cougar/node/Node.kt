@@ -60,6 +60,14 @@ class Node(private val channel: String, host: String?, port: Int, password: Stri
         }
     }
 
+    fun registerListenerClass(inputClass : Class<out PacketListener>, vararg args : Any) {
+        this.registerListener(inputClass.constructors.first().newInstance(*args) as PacketListener)
+    }
+
+    fun registerListenerClass(inputClass : Class<out PacketListener>) {
+        this.registerListener(inputClass.newInstance())
+    }
+
     fun registerListener(packetListener: PacketListener) {
         for (method in packetListener.javaClass.declaredMethods) {
             if (method.getDeclaredAnnotation(IncomingPacketHandler::class.java) != null) {
