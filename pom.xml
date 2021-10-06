@@ -7,6 +7,16 @@
     <groupId>dev.cougar</groupId>
     <artifactId>Node</artifactId>
     <version>1.0-STABLE</version>
+    <description>Redis Packets System</description>
+    <url>https://github.com/CougarNetwork/Node</url>
+    <developers>
+        <developer>
+            <name>FxMxGRAGFX</name>
+            <roles>
+                <role>Head-Developer</role>
+            </roles>
+        </developer>
+    </developers>
 
     <properties>
         <kotlin.version>1.6.0-M1</kotlin.version>

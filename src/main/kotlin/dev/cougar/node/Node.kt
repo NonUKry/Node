@@ -23,12 +23,10 @@ class Node(private val channel: String, host: String?, port: Int, password: Stri
             val `object` = packet.serialize()
                 ?: throw IllegalStateException("Packet cannot generate null serialized data")
             jedisPool.resource.use { jedis ->
-                println("[Node] Attempting to publish packet..")
                 try {
                     jedis.publish(channel, packet.id().toString() + ";" + `object`.toString())
-                    println("[Node] Successfully published packet..")
                 } catch (ex: Exception) {
-                    println("[Node] Failed to publish packet..")
+                    println("[Node] Failed publishing a packet with the id ${packet.id()}..")
                     ex.printStackTrace()
                 }
             }
@@ -50,7 +48,7 @@ class Node(private val channel: String, host: String?, port: Int, password: Stri
     }
 
     fun registerPacket(clazz: Class<out Packet>) {
-        val id = clazz.getDeclaredMethod("id").invoke(clazz.newInstance(), null) as Int
+        val id = clazz.getDeclaredMethod("id").invoke(clazz.newInstance()) as Int
         check(!(idToType.containsKey(id) || typeToId.containsKey(clazz))) { "A packet with that ID has already been registered" }
         idToType[id] = clazz
         typeToId[clazz] = id
@@ -64,7 +62,7 @@ class Node(private val channel: String, host: String?, port: Int, password: Stri
         this.registerListener(inputClass.newInstance())
     }
 
-    fun registerListener(packetListener: PacketListener) {
+    private fun registerListener(packetListener: PacketListener) {
         for (method in packetListener.javaClass.declaredMethods) {
             if (method.getDeclaredAnnotation(IncomingPacketHandler::class.java) != null) {
                 var packetClass: Class<*>? = null
@@ -81,7 +79,7 @@ class Node(private val channel: String, host: String?, port: Int, password: Stri
     }
 
     private fun setupPubSub() {
-        println("[Node] Setting up PubSup..")
+        println("[Node] Initializing the node..")
         jedisPubSub = object : JedisPubSub() {
             override fun onMessage(channel: String, message: String) {
                 if (channel.equals(this@Node.channel, ignoreCase = true)) {
