@@ -1,4 +1,4 @@
-package dev.cougar.node.packet
+package mx.fxmxgragfx.node.packet
 
 import com.google.gson.JsonObject
 

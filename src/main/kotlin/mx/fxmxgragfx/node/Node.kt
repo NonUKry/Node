@@ -1,17 +1,17 @@
-package dev.cougar.node
+package mx.fxmxgragfx.node
 
 import com.google.gson.JsonParser
-import dev.cougar.node.packet.Packet
-import dev.cougar.node.packet.handler.IncomingPacketHandler
-import dev.cougar.node.packet.handler.PacketExceptionHandler
-import dev.cougar.node.packet.listener.PacketListener
-import dev.cougar.node.packet.listener.PacketListenerData
+import mx.fxmxgragfx.node.packet.Packet
+import mx.fxmxgragfx.node.packet.handler.IncomingPacketHandler
+import mx.fxmxgragfx.node.packet.handler.PacketExceptionHandler
+import mx.fxmxgragfx.node.packet.listener.PacketListener
+import mx.fxmxgragfx.node.packet.listener.PacketListenerData
 import redis.clients.jedis.JedisPool
 import redis.clients.jedis.JedisPubSub
 import java.util.concurrent.ForkJoinPool
 
 @Suppress("USELESS_ELVIS", "unused", "DEPRECATION")
-class Node(private val channel: String, host: String?, port: Int, password: String?) {
+class Node(private val channel: String, host: String, port: Int, password: String?) {
     private val jedisPool: JedisPool
     private var jedisPubSub: JedisPubSub? = null
     private val packetListeners: MutableList<PacketListenerData>

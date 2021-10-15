@@ -1,6 +1,6 @@
-package dev.cougar.node.packet.listener
+package mx.fxmxgragfx.node.packet.listener
 
-import dev.cougar.node.packet.Packet
+import mx.fxmxgragfx.node.packet.Packet
 import java.lang.reflect.Method
 
 class PacketListenerData(val instance : Any, val method : Method, private val packetClass : Class<*>) {

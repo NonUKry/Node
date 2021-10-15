@@ -1,4 +1,4 @@
-package dev.cougar.node.packet.handler
+package mx.fxmxgragfx.node.packet.handler
 
 import java.lang.Exception
 

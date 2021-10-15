@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>dev.cougar</groupId>
+    <groupId>mx.fxmxgragfx</groupId>
     <artifactId>Node</artifactId>
     <version>1.0-STABLE</version>
     <description>Redis Packets System</description>
@@ -19,7 +19,7 @@
     </developers>
 
     <properties>
-        <kotlin.version>1.6.0-M1</kotlin.version>
+        <kotlin.version>1.5.30</kotlin.version>
     </properties>
 
     <dependencies>
