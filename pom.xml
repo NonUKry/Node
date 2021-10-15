@@ -5,10 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>mx.fxmxgragfx</groupId>
-    <artifactId>Node</artifactId>
+    <artifactId>node</artifactId>
     <version>1.0-STABLE</version>
+    <packaging>jar</packaging>
     <description>Redis Packets System</description>
-    <url>https://github.com/CougarNetwork/Node</url>
+    <url>https://github.com/FxMxGRAGFX/Node</url>
     <developers>
         <developer>
             <name>FxMxGRAGFX</name>
@@ -42,8 +43,9 @@
 
     <distributionManagement>
         <repository>
-            <id>repo</id>
-            <url>http://51.222.245.162:8081/repository/maven-releases/</url>
+            <id>github</id>
+            <name>GitHub Package</name>
+            <url>https://maven.pkg.github.com/FxMxGRAGFX/${project.artifactId}</url>
         </repository>
     </distributionManagement>
 
