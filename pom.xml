@@ -10,6 +10,14 @@
     <packaging>jar</packaging>
     <description>Redis Packets System</description>
     <url>https://github.com/FxMxGRAGFX/Node</url>
+    <contributors>
+        <contributor>
+            <name>Yxlz</name>
+            <roles>
+                <role>Ideator</role>
+            </roles>
+        </contributor>
+    </contributors>
     <developers>
         <developer>
             <name>FxMxGRAGFX</name>
