@@ -1,55 +1,63 @@
-package mx.fxmxgragfx.node
+package dev.ukry.node
 
 import com.google.gson.JsonParser
-import mx.fxmxgragfx.node.packet.Packet
-import mx.fxmxgragfx.node.packet.handler.IncomingPacketHandler
-import mx.fxmxgragfx.node.packet.handler.PacketExceptionHandler
-import mx.fxmxgragfx.node.packet.listener.PacketListener
-import mx.fxmxgragfx.node.packet.listener.PacketListenerData
+import dev.ukry.node.listener.PacketData
+import dev.ukry.node.listener.PacketListener
+import dev.ukry.node.packet.Packet
+import dev.ukry.node.packet.handler.IncomingPacketHandler
+import org.objenesis.ObjenesisStd
 import redis.clients.jedis.JedisPool
 import redis.clients.jedis.JedisPubSub
 import java.util.concurrent.ForkJoinPool
+import java.util.logging.Level
+import java.util.logging.Logger
 
-@Suppress("USELESS_ELVIS", "unused", "DEPRECATION")
-class Node(private val channel: String, host: String, port: Int, password: String?) {
+
+@Suppress("unused")//Just for aesthetic
+class Node(private val channel: String, host: String, port: Int = 6379, password: String? = null) {
+
     private val jedisPool: JedisPool
     private var jedisPubSub: JedisPubSub? = null
-    private val packetListeners: MutableList<PacketListenerData>
-    private val idToType: MutableMap<Int, Class<out Packet>> = HashMap()
-    private val typeToId: MutableMap<Class<out Packet>, Int> = HashMap()
-    @JvmOverloads
-    fun sendPacket(packet: Packet, exceptionHandler: PacketExceptionHandler? = null) {
+
+    private val packetListeners: MutableList<PacketData>
+    private val idToType: MutableMap<String, Class<out Packet>> = HashMap()
+    private val typeToId: MutableMap<Class<out Packet>, String> = HashMap()
+
+    private val constructorMaker = ObjenesisStd()
+    private val logger = Logger.getLogger(javaClass.name)
+
+    fun sendPacket(packet: Packet) {
         try {
             val `object` = packet.serialize()
-                ?: throw IllegalStateException("Packet cannot generate null serialized data")
             jedisPool.resource.use { jedis ->
                 try {
-                    jedis.publish(channel, packet.id().toString() + ";" + `object`.toString())
+                    jedis.publish(channel, packet::class.java.name + ";" + `object`.toString())
                 } catch (ex: Exception) {
-                    println("[Node] Failed publishing a packet with the id ${packet.id()}..")
-                    ex.printStackTrace()
+                    logger.log(Level.WARNING, "[Node] Failed publishing a packet with the id ${packet::class.java.name}..", ex)
                 }
             }
         } catch (e: Exception) {
-            exceptionHandler?.onException(e)
+            logger.log(Level.WARNING, "Error sending the packet ${packet::class.java.name}", e)
         }
     }
 
-    fun buildPacket(id: Int): Packet? {
+    fun findPacket(id : String): Packet? {
         if (!idToType.containsKey(id)) {
+            println("No registered")
             return null
         }
         try {
-            return idToType[id]!!.newInstance() as Packet
+            val clazz = idToType[id]!!
+            return constructorMaker.newInstance(clazz)
         } catch (e: Exception) {
-            e.printStackTrace()
+            logger.log(Level.WARNING, "Error building the packet $id", e)
         }
         throw IllegalStateException("Could not create new instance of packet type")
     }
 
     fun registerPacket(clazz: Class<out Packet>) {
-        val id = clazz.getDeclaredMethod("id").invoke(clazz.newInstance()) as Int
-        check(!(idToType.containsKey(id) || typeToId.containsKey(clazz))) { "A packet with that ID has already been registered" }
+        val id = clazz.name
+        check(!(idToType.containsKey(id) || typeToId.containsKey(clazz))) { "That packet has already been registered" }
         idToType[id] = clazz
         typeToId[clazz] = id
     }
@@ -72,32 +80,33 @@ class Node(private val channel: String, host: String, port: Int, password: Strin
                     }
                 }
                 if (packetClass != null) {
-                    packetListeners.add(PacketListenerData(packetListener, method, packetClass))
+                    packetListeners.add(PacketData(packetListener, method, packetClass))
                 }
             }
         }
     }
 
     private fun setupPubSub() {
-        println("[Node] Initializing the node..")
+        logger.info("[Node] Initializing the node..")
         jedisPubSub = object : JedisPubSub() {
             override fun onMessage(channel: String, message: String) {
                 if (channel.equals(this@Node.channel, ignoreCase = true)) {
                     try {
                         val args = message.split(";".toRegex()).toTypedArray()
-                        val id = Integer.valueOf(args[0])
-                        val packet = buildPacket(id)
+                        val packet = findPacket(args[0])
                         if (packet != null) {
-                            packet.deserialize(PARSER.parse(args[1]).asJsonObject)
+                            packet.deserialize(JsonParser.parseString(args[1]).asJsonObject)
                             for (data in packetListeners) {
                                 if (data.matches(packet)) {
                                     data.method.invoke(data.instance, packet)
                                 }
                             }
+                        } else {
+                            println(message)
+                            println("Null packet")
                         }
                     } catch (e: Exception) {
-                        println("[Node] Failed to handle message")
-                        e.printStackTrace()
+                        logger.log(Level.WARNING, "[Node] Failed to handle message", e)
                     }
                 }
             }
@@ -106,17 +115,12 @@ class Node(private val channel: String, host: String, port: Int, password: Strin
             try {
                 jedisPool.resource.use { jedis ->
                     jedis.subscribe(jedisPubSub, channel)
-                    println("[Node] Successfully subscribing to channel..")
+                    logger.info("[Node] Successfully subscribing to channel $channel..")
                 }
             } catch (exception: Exception) {
-                println("[Node] Failed to subscribe to channel..")
-                exception.printStackTrace()
+                logger.log(Level.WARNING, "[Node] Failed to subscribe to channel..", exception)
             }
         }
-    }
-
-    companion object {
-        private val PARSER = JsonParser()
     }
 
     init {
@@ -125,7 +129,7 @@ class Node(private val channel: String, host: String, port: Int, password: Strin
         if (password != null && password != "") {
             jedisPool.resource.use { jedis ->
                 jedis.auth(password)
-                println("[Node] Authenticating..")
+                logger.info("[Node] Authenticating..")
             }
         }
         setupPubSub()

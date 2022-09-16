@@ -4,48 +4,50 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>mx.fxmxgragfx</groupId>
-    <artifactId>node</artifactId>
-    <version>1.0-STABLE</version>
+    <groupId>dev.ukry</groupId>
+    <artifactId>Node</artifactId>
+    <version>2.0-STABLE</version>
     <packaging>jar</packaging>
     <description>Redis Packets System</description>
     <url>https://github.com/FxMxGRAGFX/Node</url>
-    <contributors>
-        <contributor>
-            <name>Yxlz</name>
-            <roles>
-                <role>Ideator</role>
-            </roles>
-        </contributor>
-    </contributors>
+
+    <properties>
+        <kotlin.version>1.7.10</kotlin.version>
+    </properties>
+
     <developers>
         <developer>
-            <name>FxMxGRAGFX</name>
+            <name>UKry</name>
             <roles>
                 <role>Head-Developer</role>
             </roles>
         </developer>
     </developers>
 
-    <properties>
-        <kotlin.version>1.5.30</kotlin.version>
-    </properties>
-
     <dependencies>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.6</version>
-        </dependency>
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>LATEST</version>
-        </dependency>
+        <!--  https://kotlinlang.org/docs/maven.html  -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-jdk8</artifactId>
             <version>${kotlin.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.9.0</version><!--2.9 because is more stable-->
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.objenesis/objenesis -->
+        <dependency>
+            <groupId>org.objenesis</groupId>
+            <artifactId>objenesis</artifactId>
+            <version>2.6</version>
         </dependency>
     </dependencies>
 
