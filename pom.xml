@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.ukry</groupId>
-    <artifactId>ode</artifactId>
+    <artifactId>node</artifactId>
     <version>2.0-STABLE</version>
     <packaging>jar</packaging>
     <description>Redis Packets System</description>
