@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.ukry</groupId>
-    <artifactId>Node</artifactId>
+    <artifactId>ode</artifactId>
     <version>2.0-STABLE</version>
     <packaging>jar</packaging>
     <description>Redis Packets System</description>
@@ -54,8 +54,8 @@
     <distributionManagement>
         <repository>
             <id>github</id>
-            <name>GitHub Package</name>
-            <url>https://maven.pkg.github.com/FxMxGRAGFX/${project.artifactId}</url>
+            <name>GitHub Releases</name>
+            <url>https://maven.pkg.github.com/FxMxGRAGFX/Node</url>
         </repository>
     </distributionManagement>
 
