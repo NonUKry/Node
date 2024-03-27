@@ -70,7 +70,7 @@ class Node(private val channel: String, host: String, port: Int = 6379, password
         this.registerListener(inputClass.newInstance())
     }
 
-    private fun registerListener(packetListener: PacketListener) {
+    public fun registerListener(packetListener: PacketListener) {
         for (method in packetListener.javaClass.declaredMethods) {
             if (method.getDeclaredAnnotation(IncomingPacketHandler::class.java) != null) {
                 var packetClass: Class<*>? = null
